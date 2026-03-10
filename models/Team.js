@@ -25,7 +25,7 @@ const teamSchema = new mongoose.Schema({
   },
   shipConfig: {
     type: String,
-    enum: ["Warship", "Merchant Vessel", "Ghost Ship"],
+    enum: ["WARSHIP", "MERCHANT", "GHOST"],
     required: true,
     trim: true
   },
@@ -37,14 +37,15 @@ const teamSchema = new mongoose.Schema({
   },
   round2: {
     score: { type: Number, default: 0 },
-    problemStatus: [
+    problemsStatus: [
       {
-        problemId: { type: mongoose.Schema.Types.ObjectId, ref: "Problem" },
+        problemId: { type: mongoose.Schema.Types.ObjectId, ref: "Round2Question" },
         livesLeft: { type: Number, default: 3 },
         wrongSubmissions: { type: Number, default: 0 },
+        startTime: { type: Date, default: null },
         status: {
           type: String,
-          enum: ["NOT_STARTED", "SOLVED", "SANK"],
+          enum: ["NOT_STARTED", "ACTIVE", "SOLVED", "SUNK"],
           default: "NOT_STARTED"
         }
       }

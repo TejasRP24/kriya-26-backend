@@ -4,8 +4,8 @@ export function applyActionCardEffect(actionCard, { team }) {
   switch (cardNumber) {
     case 1: {
       // Add lives to all Round 2 problems
-      if (team.round2 && Array.isArray(team.round2.problemStatus)) {
-        team.round2.problemStatus = team.round2.problemStatus.map((p) => ({
+      if (team.round2 && Array.isArray(team.round2.problemsStatus)) {
+        team.round2.problemsStatus = team.round2.problemsStatus.map((p) => ({
           ...(p.toObject?.() || p),
           livesLeft: (p.livesLeft || 0) + 2
         }));
