@@ -3,9 +3,10 @@ name: Build and Push Backend Container
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   build-and-push:
@@ -16,7 +17,7 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Log in to GHCR
@@ -26,10 +27,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build backend image
+      - name: Build Docker image
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/judge-backend:latest .
 
-      - name: Push backend image
+      - name: Push Docker image
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/judge-backend:latest
