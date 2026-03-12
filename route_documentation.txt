@@ -1,0 +1,74 @@
+# Action Cards System - API Documentation
+
+Base URL: `http://localhost:3000/kriyabe` (assuming standard mount point)
+
+All routes below require Bearer Token Authentication (Team Role).
+
+## Action Card Management
+
+### 1. View All Available Action Cards
+**GET** `/api/actionCards`
+- **Description**: Returns all card definitions in the game.
+- **Example Response**:
+```json
+[
+  {
+    "_id": "card_id_1",
+    "cardNumber": 1,
+    "name": "Black Pearl’s Resurgence",
+    "description": "Gain 2 extra lives."
+  },
+  ...
+]
+```
+
+### 2. View Owned Action Cards
+**GET** `/api/players/:kriyaID/cards`
+- **Description**: Returns cards currently owned by the team and not yet used.
+- **Headers**: `Authorization: Bearer <token>`
+
+### 3. Activate an Action Card
+**POST** `/api/players/:kriyaID/cards/:cardId/use`
+- **Description**: Activates a card from the team's inventory and applies its effect (immediate or temporary).
+- **Headers**: `Authorization: Bearer <token>`
+- **Example Response**:
+```json
+{
+  "msg": "Card activated successfully",
+  "effect": "One failed testcase will be ignored for the next submission.",
+  "card": "Davy Jones’ Mercy"
+}
+```
+
+---
+
+## Game Actions (with Cards)
+
+### 4. Submit Question Solution
+**POST** `/api/players/:kriyaID/submit`
+- **Description**: Submits a coding solution. Applies active effects:
+  - **Davy Jones’ Mercy**: Ignores 1 failed testcase if exactly 1 fails.
+  - **Isla de Muerta Treasure**: Adds +10 bonus points on success.
+  - **Spyglass Focus**: Returns failed testcase index on failure.
+  - **Anchor Drop**: Acknowledges difficulty lock on success.
+- **Body**:
+```json
+{
+  "problemId": "...",
+  "language": "PYTHON",
+  "code": "..."
+}
+```
+- **Headers**: `Authorization: Bearer <token>`
+
+### 5. Mini-game Completion
+**POST** `/api/players/:kriyaID/minigame-complete`
+- **Description**: Applies mini-game rewards. Applies active effects:
+  - **Chest of Cortés**: Doubles base reward and adds +5 bonus points.
+- **Body**:
+```json
+{
+  "baseReward": 5
+}
+```
+- **Headers**: `Authorization: Bearer <token>`

@@ -1,6 +1,5 @@
-import dns from "node:dns";
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+// import dns from "node:dns";
+// dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 import dotenv from "dotenv";
 import express from "express";
@@ -18,6 +17,8 @@ import round2Routes from "./routes/round2Routes.js";
 import round1SubmissionRoutes from "./routes/round1submissionRoutes.js";
 import round2SubmissionRoutes from "./routes/round2submissionRoutes.js";
 import leaderboardRoutes from "./routes/leaderboardRoutes.js";
+import ActionCardLogicRoutes from "./routes/ActionCardLogicRoutes.js";
+import GameLogicRoutes from "./routes/GameLogicRoutes.js";
 
 dotenv.config();
 
@@ -46,7 +47,7 @@ mainRouter.get("/", (req, res) => {
 // Admin routes (existing — includes nested round1/2 questions, leaderboard, teams, algorithm cards)
 mainRouter.use("/api/admin", adminRoutes);
 mainRouter.use("/api/otp", otpRoutes);
-mainRouter.use("/api/round1", round1Routes); 
+mainRouter.use("/api/round1", round1Routes);
 mainRouter.use("/api/auth", AuthRoutes);
 mainRouter.use("/api/teams", teamRoutes);
 // mainRouter.use("/", SubmissionRoutes);
@@ -73,6 +74,10 @@ mainRouter.use("/api/action-cards", actionCardRoutes);
 
 // Leaderboard routes (standalone)
 mainRouter.use("/api/leaderboard", leaderboardRoutes);
+
+// New Action Card System Routes
+mainRouter.use("/api", ActionCardLogicRoutes); // Mounts /players and /actionCards
+mainRouter.use("/api", GameLogicRoutes);       // Mounts /players/:playerId/submit and minigame-complete
 
 app.use("/kriyabe", mainRouter);
 
