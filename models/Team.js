@@ -21,6 +21,7 @@ const teamSchema = new mongoose.Schema({
   regMail: {
     type: String,
     required: true,
+    lowercase: true,
     unique: true
   },
   shipConfig: {
