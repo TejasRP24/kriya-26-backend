@@ -95,14 +95,34 @@ export const createSubmission = async (req, res) => {
             problemEntry.livesLeft -= 1;
             problemEntry.wrongSubmissions += 1;
 
+            const revealHidden = team.round2.revealFailedTestcaseNextRun || false;
+
             responseData = {
                 verdict: "WRONG_ANSWER",
                 passedTestCases: executionResult.passed,
                 totalTestCases: executionResult.total,
-                livesLeft: problemEntry.livesLeft
+                livesLeft: problemEntry.livesLeft,
+                testResults: executionResult.results.map((res, index) => {
+                    const isHidden = problem.testCases[index].isHidden;
+                    const showDetails = !isHidden || revealHidden;
+                    return {
+                        input: showDetails ? res.input : "[HIDDEN]",
+                        expectedOutput: showDetails ? res.expectedOutput : "[HIDDEN]",
+                        actualOutput: (showDetails || (!res.passed && isHidden)) ? res.actualOutput : "[HIDDEN]",
+                        passed: res.passed,
+                        status: res.statusDescription,
+                        isHidden: isHidden
+                    };
+                })
             };
+
+            // Reset reveal flag after use
+            if (revealHidden) {
+                team.round2.revealFailedTestcaseNextRun = false;
+            }
         } else {
             // --- ALL TEST CASES PASS ---
+            const revealHidden = team.round2.revealFailedTestcaseNextRun || false;
             problemEntry.status = "SOLVED";
 
             // Calculate score: base score = 100 (can be adjusted)
@@ -118,8 +138,25 @@ export const createSubmission = async (req, res) => {
                 passedTestCases: executionResult.passed,
                 totalTestCases: executionResult.total,
                 score: finalScore,
-                livesLeft: problemEntry.livesLeft
+                livesLeft: problemEntry.livesLeft,
+                testResults: executionResult.results.map((res, index) => {
+                    const isHidden = problem.testCases[index].isHidden;
+                    const showDetails = !isHidden || revealHidden;
+                    return {
+                        input: showDetails ? res.input : "[HIDDEN]",
+                        expectedOutput: showDetails ? res.expectedOutput : "[HIDDEN]",
+                        actualOutput: showDetails ? res.actualOutput : "[HIDDEN]",
+                        passed: res.passed,
+                        status: res.statusDescription,
+                        isHidden: isHidden
+                    };
+                })
             };
+
+            // Reset reveal flag after use
+            if (revealHidden) {
+                team.round2.revealFailedTestcaseNextRun = false;
+            }
         }
 
         // Check if sunk (lives exhausted before solving)
@@ -141,7 +178,15 @@ export const createSubmission = async (req, res) => {
             code,
             passedTestCases: executionResult.passed || 0,
             totalTestCases: executionResult.total || 0,
-            lifeLost
+            lifeLost,
+            results: executionResult.results ? executionResult.results.map((res, index) => ({
+                input: res.input,
+                expectedOutput: res.expectedOutput,
+                actualOutput: res.actualOutput,
+                passed: res.passed,
+                statusDescription: res.statusDescription,
+                isHidden: problem.testCases[index].isHidden
+            })) : []
         });
         await submission.save();
 
